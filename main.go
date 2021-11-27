@@ -1,4 +1,4 @@
-package go_demo_search
+package main
 
 import (
 	_ "github.com/dfsd534/go_demo_search/matchers"

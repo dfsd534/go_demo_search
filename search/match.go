@@ -17,7 +17,7 @@ type Matcher interface {
 	Search(feed *Feed, searchTerm string) ([]*Result, error)
 }
 
-//Match函数，为每个数据源单独启动goroutine来执行这个函数
+//Match 函数，为每个数据源单独启动goroutine来执行这个函数
 //并发地执行搜索
 func Match(matcher Matcher, feed *Feed, searchTerm string, results chan<- *Result) {
 	//对特定的匹配器执行搜索
@@ -33,7 +33,7 @@ func Match(matcher Matcher, feed *Feed, searchTerm string, results chan<- *Resul
 	}
 }
 
-//Display 从每个单独的gotoutine接受到结果后
+//Display 从每个单独的goroutine接受到结果后
 //在终端窗口输出
 func Display(results chan *Result) {
 	//通道会一直被阻塞，直到有结果写入

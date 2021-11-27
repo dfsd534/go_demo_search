@@ -29,16 +29,16 @@ func Run(searchTerm string) {
 	//为每个数据源启动一个goroutine来查找结果
 	for _, feed := range feeds {
 		//获取一个匹配器用户查找
-		matchers, exists := matchers[feed.Type]
+		matcher, exists := matchers[feed.Type]
 		if !exists {
-			matchers = matchers["default"]
+			matcher = matchers["default"]
 		}
 
 		//启动一个goroutine来执行搜索
 		go func(matcher Matcher, feed *Feed) {
 			Match(matcher, feed, searchTerm, results)
 			waitGroup.Done()
-		}(matchers, feed)
+		}(matcher, feed)
 	}
 
 	//启动一个goroutine来监控是否所有的工作都做完了

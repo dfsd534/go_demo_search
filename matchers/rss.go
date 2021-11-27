@@ -5,7 +5,9 @@ import (
 	"errors"
 	"fmt"
 	"github.com/dfsd534/go_demo_search/search"
+	"log"
 	"net/http"
+	"regexp"
 )
 
 type (
@@ -90,4 +92,42 @@ func (m rssMatcher) retrieve(feed *search.Feed) (*rssDocument, error) {
 	var document rssDocument
 	err = xml.NewDecoder(resp.Body).Decode(&document)
 	return &document, err
+}
+
+//Search 在文档中查找特定的搜索项
+func (m rssMatcher) Search(feed *search.Feed, searchTerm string) ([]*search.Result, error) {
+	var results []*search.Result
+	log.Printf("Search Feed[%s] Type[%s] for Uri[%s]\n", feed.Name, feed.Type, feed.URI)
+
+	//获取要搜索的数据
+	document, err := m.retrieve(feed)
+	if err != nil {
+		return nil, err
+	}
+
+	for _, channelItem := range document.Channel.Item {
+		//检查标题是否包含搜索项
+		matched, err := regexp.MatchString(searchTerm, channelItem.Title)
+		if err != nil {
+			return nil, err
+		}
+
+		//如果找到搜索项，作为结果项保存
+		if matched {
+			results = append(results, &search.Result{Field: "Title", Content: channelItem.Title})
+		}
+
+		//检查描述部分是否包含搜索项
+		matched, err = regexp.MatchString(searchTerm, channelItem.Description)
+		if err != nil {
+			return nil, err
+		}
+
+		//如果找到搜索项，将其保存为结果
+		if matched {
+			results = append(results, &search.Result{Field: "Description", Content: channelItem.Description})
+		}
+	}
+
+	return results, nil
 }
